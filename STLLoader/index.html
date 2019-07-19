@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Three.js</title>
+    <style type="text/css">
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden
+        }
+    </style>
+</head>
+
+<body>
+    <div id="webgl"></div>
+    <script src="http://threejs.org/build/three.min.js"></script>
+    <script src="http://threejs.org/examples/js/controls/OrbitControls.js"></script>
+    <script type="text/javascript" src="Build/STLLoader.js"></script>
+    <script src="./loader.js"></script>
+
+    <script> document.addEventListener("drop", function (event) {
+            event.preventDefault();
+
+            loadFiles(event.dataTransfer.files);
+        });
+        document.addEventListener('dragover', function (event) {
+
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'copy';
+
+        }, false);
+
+    </script>
+</body>
+
+</html>
