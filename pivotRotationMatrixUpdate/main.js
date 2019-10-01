@@ -7,50 +7,57 @@ var container,
     controls;
 
 'use strict';
+
 main();
-function main (){
+
+function main() {
     initScene();
     cube = drawCube(20, 10, 0.01);
     var box = new THREE.Box3().setFromObject(cube);
     var boxSize = new THREE.Vector3();
     box.getSize(boxSize);
     cube.position.set(boxSize.x / 2, 0, 0);
+
     //CREATE PIVOT MATRIX
-    var position = new THREE.Vector3(cube.position.x-boxSize.x / 2, 0, 0);
+    var position = new THREE.Vector3(cube.position.x - boxSize.x / 2, 0, 0);
     var rotation = new THREE.Quaternion();
     var eulerRot = new THREE.Euler();
-    eulerRot.set(0,0,0);
+    eulerRot.set(0, 0, 0);
     rotation.setFromEuler(eulerRot);
-    
-    pivot_matrix =createPivotMatrix(position,rotation);
+
+    pivot_matrix = createPivotMatrix(position, rotation);
+    applyPivot();
 }
 
 function createPivotMatrix(position, rotation) {
-    var pivot_matrix = new THREE.Matrix4;
+    var pivot_matrix = new THREE.Matrix4();
     var scale = new THREE.Vector3(1, 1, 1);
     pivot_matrix.compose(position, rotation, scale);
     return pivot_matrix;
 }
 
-function applyPivot(){
-    // get world transforms from desired pivot
-       //  var pivot_matrix = pivot.matrixWorld.clone();
-       // inverse it to know how to move pivot to [0,0,0]
-       let pivot_inv = new THREE.Matrix4().getInverse(pivot_matrix, false);
-   
-       // place pivot to [0,0,0]
-       // apply same transforms to object
-       cube.applyMatrix(pivot_inv);
-   
-       // say, we want to rotate 0.1deg around Y axis of pivot
-       var desiredTransform = new THREE.Matrix4().makeRotationY(Math.PI / 180);
-       cube.applyMatrix(desiredTransform);
-   
-       // and put things back, i.e. apply pivot initial transformation
-       cube.applyMatrix(pivot_matrix);
-   }
+function applyPivot() {
 
-   function initScene() {
+    // get world transforms from desired pivot
+    // inverse it to know how to move pivot to [0,0,0]
+    let pivot_inv = new THREE.Matrix4().getInverse(pivot_matrix, false);
+
+    // place pivot to [0,0,0]
+    // apply same transforms to object
+    cube.applyMatrix(pivot_inv);
+    var rotation = new THREE.Quaternion();
+    var eulerRot = new THREE.Euler();
+    eulerRot.set(0, 0, 0);
+    rotation.setFromEuler(eulerRot);
+    // say, we want to rotate 0.1deg around Y axis of pivot
+    var desiredTransform = new THREE.Matrix4().compose(new THREE.Vector3(0,5,0),rotation,new THREE.Vector3(1, 1, 1));
+    cube.applyMatrix(desiredTransform);
+
+    // and put things back, i.e. apply pivot initial transformation
+   cube.applyMatrix(pivot_matrix);
+}
+
+function initScene() {
     // dom
     container = document.createElement('div');
     document.body.appendChild(container);
@@ -90,7 +97,7 @@ function render() {
 // animate            
 (function animate() {
     requestAnimationFrame(animate);
-    applyPivot();
+    
     controls.update()
     render();
 
