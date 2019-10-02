@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CollisionRaycaster } from './Raycasting.js';
-import { Transformer } from './Transformer.js';
-import * as TWEEN from 'es6-tween';
+import TWEEN from '@tweenjs/tween.js'
+
 'use strict';
 
 var container,
@@ -14,7 +14,6 @@ var container,
 
 var colliders = [];
 var raycast = new CollisionRaycaster();
-var transformer;
 main();
 
 function main() {
@@ -41,17 +40,8 @@ function initScene() {
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
     camera.position.set(10, 10, 15);
 
-    transformer = new Transformer(camera, colliders);
     //controls
     controls = new OrbitControls(camera, renderer.domElement);
-    controls.enablePan = true;
-    controls.enableZoom = true;
-    controls.enableDamping = true;
-    controls.minPolarAngle = 0.8;
-    controls.maxPolarAngle = 2.4;
-    controls.dampingFactor = 0.07;
-    controls.rotateSpeed = 0.07;
-
 
     //controls.update() must be called after any manual changes to the camera's transform
     controls.update();
@@ -111,20 +101,26 @@ function mouseMove(e) {
 }
 
 function onSelect(element) {
-  // controls.target = element.position;
+    // controls.target = element.position;
+
     lookAtSmooth(element);
 }
 
 function lookAtSmooth(object) {
+
     // backup original rotation
     var startRotation = new THREE.Euler().copy(camera.rotation);
     // final rotation (with lookAt)
     camera.lookAt(object.position);
     var endRotation = new THREE.Euler().copy(camera.rotation);
-
     // revert to original rotation
     camera.rotation.copy(startRotation);
 
     // Tween
-    new TWEEN.Tween(camera).to({ rotation: endRotation }, 600).start();
+    new TWEEN.Tween(camera.rotation).to({ x: endRotation.x, y: endRotation.y, z: endRotation.z }, 250).start().onComplete(function(){
+        controls.target = object.position;  
+    });
+
+
+
 }
